@@ -1,8 +1,6 @@
 #include <xc.h>
 #include "i2c.h"
 
-// Define a frequncia do I2C
-#define F_SCL 100000UL 
 
 // --- Funes Auxiliares Internas ---
 

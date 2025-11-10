@@ -23,7 +23,7 @@
 
 // CONFIG4L
 #pragma config STVREN = ON      // Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)
-#pragma config LVP = ON         // Single-Supply ICSP Enable bit (Single-Supply ICSP enabled)
+#pragma config LVP = OFF         // Single-Supply ICSP Enable bit (Single-Supply ICSP enabled)
 #pragma config BBSIZ = 1024     // Boot Block Size Select bits (1K words (2K bytes) Boot Block)
 #pragma config XINST = OFF      // Extended Instruction Set Enable bit (Instruction set extension and Indexed Addressing mode disabled (Legacy mode))
 
@@ -83,11 +83,11 @@
 #define SENSOR_CHANNEL 0 // AN0
 #define REF_CHANNEL    1 // AN1
 
-#define R_FIXO 10000.0
+#define R_FIXO 10000
 #define STEINHART_A 0.001129148
 #define STEINHART_B 0.000234125
 #define STEINHART_C 0.0000000876741
-#define ADC_MAX    1023.0 
+#define ADC_MAX    1023 
 #define N_AMOSTRAS 10     
 
 // --- Funo ftoa (permanece igual) ---
@@ -112,7 +112,10 @@ void ftoa(float f, char *buffer, int precision) {
 int main(void) {
     // --- Configurao do Oscilador Interno ---
     // OSCCON = 0x72: 8MHz, estvel, fonte interna
-    OSCCON = 0x70; 
+    OSCCON = 0b01110010;
+    
+    TRISDbits.TRISD0 = 0;
+    LATDbits.LATD0 = 0;
 
     // --- Inicializao dos Mdulos ---
     ADC_Init();  
@@ -136,7 +139,10 @@ int main(void) {
         
         char tempBuffer[16]; 
         char tensaoBuffer[16]; 
-
+        LATDbits.LATD0 = 1;   // Liga o LED
+        __delay_ms(500);
+        LATDbits.LATD0 = 0;   // Desliga o LED
+        __delay_ms(500);
         // 1. Ler os dois ramos
         for (int i = 0; i < N_AMOSTRAS; i++) {
             leituraSensorSum += ADC_Read(SENSOR_CHANNEL); // AN0
