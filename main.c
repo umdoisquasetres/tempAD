@@ -66,8 +66,6 @@
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
 
-#define _XTAL_FREQ 8000000
-
 // --- Incluso de Bibliotecas ---
 #include <xc.h>
 #include <math.h>
@@ -131,8 +129,8 @@ int main(void) {
     while (1) {
         long leituraSensorSum = 0;
         long leituraRefSum = 0;
-        int leituraSensorAvg;
-        int leituraRefAvg;
+        long leituraSensorAvg;
+        long leituraRefAvg;
         float resistenciaNTC;
         float tempKelvin;
         float tempCelsius;
@@ -155,7 +153,7 @@ int main(void) {
         // ... (Clculo da resistnciaNTC - TUDO IGUAL) ...
         if (leituraSensorAvg <= 0 || leituraSensorAvg >= ADC_MAX ||
             leituraRefAvg <= 0 || leituraRefAvg >= ADC_MAX ||
-            (2.0 * leituraRefAvg - leituraSensorAvg) <= 0) {
+            (2.0 * (double)leituraRefAvg - (double)leituraSensorAvg) <= 0) {
             LCD_SetCursor(0, 0);
             LCD_PrintString("Falha no sensor!");
             LCD_SetCursor(0, 1);
@@ -164,7 +162,7 @@ int main(void) {
             continue; 
         }
 
-        resistenciaNTC = (R_FIXO * leituraSensorAvg) / (2.0 * leituraRefAvg - leituraSensorAvg);
+        resistenciaNTC = ((double)R_FIXO * (double)leituraSensorAvg) / (2.0 * (double)leituraRefAvg - (double)leituraSensorAvg);
 
         // ... (Clculo da temperatura - TUDO IGUAL) ...
         float logNTC = log(resistenciaNTC);

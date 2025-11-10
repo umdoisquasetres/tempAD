@@ -55,31 +55,3 @@ uint8_t I2C_Write(uint8_t data) {
     }
     return 0; // ACK recebido
 }
-
-uint8_t I2C_Read_ACK(void) {
-    uint8_t data;
-    I2C_Wait();
-    SSPCON2bits.RCEN = 1; // Habilita modo de recepo
-    while (!SSPSTATbits.BF); // Espera o buffer ficar cheio
-    data = SSPBUF; // L o dado
-    
-    I2C_Wait();
-    SSPCON2bits.ACKDT = 0; // Prepara para enviar ACK
-    SSPCON2bits.ACKEN = 1; // Envia o ACK
-    while (SSPCON2bits.ACKEN); // Espera o envio do ACK
-    return data;
-}
-
-uint8_t I2C_Read_NACK(void) {
-    uint8_t data;
-    I2C_Wait();
-    SSPCON2bits.RCEN = 1; // Habilita modo de recepo
-    while (!SSPSTATbits.BF); // Espera o buffer ficar cheio
-    data = SSPBUF; // L o dado
-    
-    I2C_Wait();
-    SSPCON2bits.ACKDT = 1; // Prepara para enviar NACK
-    SSPCON2bits.ACKEN = 1; // Envia o NACK
-    while (SSPCON2bits.ACKEN); // Espera o envio do NACK
-    return data;
-}
