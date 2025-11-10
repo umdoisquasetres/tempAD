@@ -125,6 +125,9 @@ int main(void) {
     __delay_ms(500); // MUDANA AQUI
     LCD_Clear();
 
+    float tempMin = 999.0;
+    float tempMax = -999.0;
+
     // --- Loop Principal ---
     while (1) {
         long leituraSensorSum = 0;
@@ -136,7 +139,6 @@ int main(void) {
         float tempCelsius;
         
         char tempBuffer[16]; 
-        char tensaoBuffer[16]; 
         LATDbits.LATD0 = 1;   // Liga o LED
         __delay_ms(500);
         LATDbits.LATD0 = 0;   // Desliga o LED
@@ -169,23 +171,25 @@ int main(void) {
         tempKelvin = (1.0 / (STEINHART_A + (STEINHART_B * logNTC) + (STEINHART_C * logNTC * logNTC * logNTC)));
         tempCelsius = tempKelvin - 273.15;
 
+        if (tempCelsius > tempMax) {
+            tempMax = tempCelsius;
+        }
+        if (tempCelsius < tempMin) {
+            tempMin = tempCelsius;
+        }
+
         // ... (Exibio dos valores - TUDO IGUAL) ...
         ftoa(tempCelsius, tempBuffer, 2); 
 
         LCD_SetCursor(0, 0);
         LCD_PrintString("Temp: ");
         LCD_PrintString(tempBuffer);
-        LCD_PrintString(" C   ");
+        LCD_PrintString(" C");
 
-        long valorPonte = leituraSensorAvg - leituraRefAvg;
-        float tensaoPonte = (valorPonte / ADC_MAX) * 5.0;
-        
-        ftoa(tensaoPonte, tensaoBuffer, 2);
-
+        char minMaxBuffer[16];
+        sprintf(minMaxBuffer, "Min:%.1f Max:%.1f", tempMin, tempMax);
         LCD_SetCursor(0, 1);
-        LCD_PrintString("A-B(V):");
-        LCD_PrintString(tensaoBuffer);
-        LCD_PrintString(" V   ");
+        LCD_PrintString(minMaxBuffer);
 
         __delay_ms(5000); // MUDANA AQUI
     }
